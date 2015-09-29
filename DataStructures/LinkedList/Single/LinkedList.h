@@ -27,7 +27,7 @@ extern "C" {
     };
 
     LinkedList *LLInit();
-    void LLAdd(LinkedList *, void *);
+    int LLAddBase(LinkedList *, void *);
 
 
 #ifdef	__cplusplus
