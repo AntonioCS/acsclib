@@ -42,20 +42,14 @@ extern "C" {
     return result != 0; \
 } \
 
-#define mu_all_tests(test_list) static char *all_tests() {\
+#define mu_all_tests(...) static char *all_tests() {\
 \
     testFuncPtr funcs[] = {\
-        test_list,\
-        NULL\
+        __VA_ARGS__\
     };\
 \
-    int funcsPosition = 0;\
-    while (1) {\
-        \
-        if (funcs[funcsPosition] == NULL) {\
-            break;\
-        }\
-        mu_run_test(funcs[funcsPosition++]);\
+    for (int funcsPosition = 0, max = (sizeof(funcs) / sizeof(funcs[0])); funcsPosition < max; funcsPosition++) {\
+        mu_run_test(funcs[funcsPosition]);\
     }\
     \
     return 0;\
