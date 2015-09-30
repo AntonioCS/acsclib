@@ -27,8 +27,17 @@ extern "C" {
     };
 
     LinkedList *LLInit();
-    int LLAddBase(LinkedList *, void *);
 
+    int LLAddHead(LinkedList *, void *);
+    int LLAddTail(LinkedList *, void *);
+    int LLAdd(LinkedList *, void *);
+
+
+    void *LLRemoveHead(LinkedList *);
+    void *LLRemoveTail(LinkedList *);
+    void *LLRemoveNode(LinkedList *, LinkedListNode *);
+
+    void *LLFindNode(LinkedList *, void *);
 
 #ifdef	__cplusplus
 }
