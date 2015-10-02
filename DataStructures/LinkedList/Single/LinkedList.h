@@ -18,7 +18,6 @@ extern "C" {
     struct LinkedList {
         LinkedListNode *head;
         LinkedListNode *tail;
-        LinkedListNode *current;
     };
 
     struct LinkedListNode {
@@ -37,7 +36,11 @@ extern "C" {
     void *LLRemoveTail(LinkedList *);
     void *LLRemoveNode(LinkedList *, LinkedListNode *);
 
-    void *LLFindNode(LinkedList *, void *);
+    typedef int (*LLFindCompareFunc)(void *, void *);
+    LinkedListNode *LLFindNode(LinkedList *,  LinkedListNode *);
+    LinkedListNode *LLFindNodeByData(LinkedList *, void *, LLFindCompareFunc *);
+    LinkedListNode *LLFindNodeByNext(LinkedList *, LinkedListNode *);
+
 
 #ifdef	__cplusplus
 }
