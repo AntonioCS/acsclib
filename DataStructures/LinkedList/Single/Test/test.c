@@ -55,11 +55,32 @@ static char *test_LLAddHead() {
     return 0;
 }
 
+static char *test_LLRemoveNode() {
+    LinkedList *ll = LLInit();
+
+    char data1[] = "teste";
+    char data2[] = "teste";
+    char data3[] = "teste";
+    char data4[] = "teste";
+
+    LLAddHead(ll, data1);
+    LLAddHead(ll, data2);
+    LLAddHead(ll, data3);
+    LLAddHead(ll, data4);
+
+    LLRemoveNode(ll, ll->head);
+    
+
+    return 0;
+}
+
 
 mu_all_tests(
         test_LLInit,
         test_LLAddTail,
-        test_LLAddHead
+        test_LLAddHead,
+
+        test_LLRemoveNode
 )
 
 mu_main()
