@@ -9,15 +9,30 @@ enum LLAddStrategy {
     TAIL
 };
 
+struct LLFindNodeBaseParams {
+    LinkedList *ll;
+
+    void *data;
+    LLFindCompareFunc *compareFunc;
+
+    LinkedListNode *node;
+    LinkedListNode *next;
+};
+
+struct LLFindNodeBaseResult {
+    LinkedListNode *prev;
+    LinkedListNode *node;
+};
+
+struct LLFindNodeBaseResult *LLFindNodeBase(struct LLFindNodeBaseParams *);
+
 static LinkedListNode *NodeInit();
 static int LLAddBase(LinkedList *, void *, enum LLAddStrategy);
-static void *LLRemoveBase(LinkedList *, LinkedListNode *);
 
 LinkedList *LLInit() {
     LinkedList *ll = malloc(sizeof (LinkedList));
     check(ll, "Unable to allocate memory for linked list");
 
-    ll->current = NULL;
     ll->head = NULL;
     ll->tail = NULL;
 
@@ -40,13 +55,13 @@ int LLAddBase(LinkedList *ll, void *data, enum LLAddStrategy type) {
     LinkedListNode *node = NodeInit(data, NULL);
 
     if (ll->head == NULL) {
-        ll->current = ll->tail = ll->head = node;
+        ll->tail = ll->head = node;
     } else {
         if (type == HEAD) {
             node->next = ll->head;
-            ll->current = ll->head = node;
+            ll->head = node;
         } else {
-            ll->current = ll->tail->next = node;
+            ll->tail->next = node;
             ll->tail = ll->tail->next;
         }
     }
@@ -110,5 +125,20 @@ void *LLRemoveTail(LinkedList *ll) {
 }
 
 void *LLRemoveNode(LinkedList *ll, LinkedListNode *node) {
+    void *data = node->data;
 
+
+    if (node == ll->head) {
+        if (ll->head->next == NULL) {
+            ll->head = ll->tail = NULL;
+        } else {
+            ll->head = ll->head->next;
+        }
+    } else {
+        if (node == ll->tail) {
+        }
+
+    }
+
+    return data;
 }
