@@ -27,18 +27,17 @@ extern "C" {
 
     LinkedList *LLInit();
 
-    int LLAddHead(LinkedList *, void *);
-    int LLAddTail(LinkedList *, void *);
-    int LLAdd(LinkedList *, void *);
+    LinkedListNode *LLAddHead(LinkedList *, void *);
+    LinkedListNode *LLAddTail(LinkedList *, void *);
+    LinkedListNode *LLAdd(LinkedList *, void *);
 
 
     void *LLRemoveHead(LinkedList *);
     void *LLRemoveTail(LinkedList *);
     void *LLRemoveNode(LinkedList *, LinkedListNode *);
 
-    typedef int (*LLFindCompareFunc)(void *, void *);
-    LinkedListNode *LLFindNode(LinkedList *,  LinkedListNode *);
-    LinkedListNode *LLFindNodeByData(LinkedList *, void *, LLFindCompareFunc *);
+    typedef int (*LLFindCompareFuncPtr)(void *, void *);    
+    LinkedListNode *LLFindNodeByData(LinkedList *, void *, LLFindCompareFuncPtr);
     LinkedListNode *LLFindNodeByNext(LinkedList *, LinkedListNode *);
 
 
