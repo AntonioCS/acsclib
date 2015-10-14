@@ -31,7 +31,6 @@ extern "C" {
     LinkedListNode *LLAddTail(LinkedList *, void *);
     LinkedListNode *LLAdd(LinkedList *, void *);
 
-
     void *LLRemoveHead(LinkedList *);
     void *LLRemoveTail(LinkedList *);
     void *LLRemoveNode(LinkedList *, LinkedListNode *);
