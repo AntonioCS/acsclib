@@ -146,6 +146,9 @@ void *LLRemoveTail(LinkedList *ll) {
 
 void *LLRemoveNode(LinkedList *ll, LinkedListNode *node) {
     void *data = node->data;
+    struct FindResult *res = LLFindNode(ll, node);
+
+    check(res->node, "Node not found on List");
 
     if (node == ll->head) {
         if (ll->head->next == NULL) {
@@ -155,25 +158,38 @@ void *LLRemoveNode(LinkedList *ll, LinkedListNode *node) {
         }
     } else {
         if (node == ll->tail) {
+            res->prev->next = NULL;
+            ll->tail = res->prev;
+        } else {
+            res->prev->next = node->next;
         }
-
     }
 
+    free(node);
     return data;
+
+error:
+    return NULL;
 }
 
 struct FindResult *LLFindNode(LinkedList *ll, LinkedListNode *node) {
 
-    struct FindResult *res = FindNodeBase(&((struct LLFindNodeBaseParams) {
-        .ll = ll, .node = node}));
+    struct LLFindNodeBaseParams fnbParams = {
+        .ll = ll,
+        .node = node
+    };
+    struct FindResult *res = FindNodeBase(&fnbParams);
     return res;
-
 }
 
 LinkedListNode *LLFindNodeByData(LinkedList *ll, void *data, LLFindCompareFuncPtr func) {
 
-    struct FindResult *res = FindNodeBase(&((struct LLFindNodeBaseParams) {
-        .ll = ll, .data = data, .compareFunc = func}));
+    struct LLFindNodeBaseParams fnbParams = {
+        .ll = ll,
+        .data = data,
+        .compareFunc = func
+    };
+    struct FindResult *res = FindNodeBase(&fnbParams);
 
     LinkedListNode *node = res->node;
     free(res);
@@ -183,8 +199,11 @@ LinkedListNode *LLFindNodeByData(LinkedList *ll, void *data, LLFindCompareFuncPt
 
 LinkedListNode *LLFindNodeByNext(LinkedList *ll, LinkedListNode *nodeNext) {
 
-    struct FindResult *res = FindNodeBase(&((struct LLFindNodeBaseParams) {
-        .ll = ll, .next = nodeNext}));
+    struct LLFindNodeBaseParams fnbParams = {
+        .ll = ll,
+        .next = nodeNext
+    };
+    struct FindResult *res = FindNodeBase(&fnbParams);
 
     LinkedListNode *node = res->node;
     free(res);
@@ -237,14 +256,6 @@ bool FindByNode(struct LLFindNodeBaseParams *params, struct FindResult *res, Lin
     return FindResultSetResult(params->node == node, res, node);
 }
 
-/**
- * This one is a bit different from the others in terms of assignment
- *
- * @param params
- * @param res
- * @param node
- * @return
- */
 bool FindByNextNode(struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
     return FindResultSetResult(params->next == node->next, res, node);
 }
@@ -271,4 +282,3 @@ struct FindResult *InitFindResult() {
 error:
     return NULL;
 }
-
