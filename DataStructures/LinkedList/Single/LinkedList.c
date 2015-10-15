@@ -5,6 +5,8 @@
 #include "LinkedList.h"
 #include "../../../dbg.h"
 
+typedef int (*LLFindCompareFuncPtr)(const void *, const void *);
+
 enum LLAddStrategy {
     HEAD,
     TAIL
@@ -25,193 +27,47 @@ struct FindResult {
     LinkedListNode *node;
 };
 
-
-static struct FindResult *FindNodeBase(struct LLFindNodeBaseParams *);
-
 typedef bool(*findByFuncPtr)(struct LLFindNodeBaseParams *, struct FindResult *, LinkedListNode *);
-static bool FindByData(struct LLFindNodeBaseParams *, struct FindResult *, LinkedListNode *);
-//To the outside this function is not really necessary
-static struct FindResult *LLFindNode(LinkedList *, LinkedListNode *);
-static bool FindByNode(struct LLFindNodeBaseParams *, struct FindResult *, LinkedListNode *);
-static bool FindByNextNode(struct LLFindNodeBaseParams *, struct FindResult *, LinkedListNode *);
-static struct FindResult *InitFindResult(void);
-static bool FindResultSetResult(bool, struct FindResult *, LinkedListNode *);
-//static struct LLFindNodeBaseParams *InitLLFindNodeBaseParams();
+
+//<editor-fold defaultstate="collapsed" desc="Private functions">
 
 
-
-static LinkedListNode *NodeInit();
-static LinkedListNode *LLAddBase(LinkedList *, void *, enum LLAddStrategy);
-
-LinkedList *LLInit() {
-    LinkedList *ll = malloc(sizeof (LinkedList));
-    check(ll, "Unable to allocate memory for linked list");
-
-    ll->head = NULL;
-    ll->tail = NULL;
-
-    return ll;
-
-error:
-    return NULL;
-}
-
-/**
- * Add an item to the linked list in the head or the tail
- * 
- * @param ll
- * @param data
- * @param type
- * @return int (will be 1 for failure and 0 for sucess)
- */
-LinkedListNode *LLAddBase(LinkedList *ll, void *data, enum LLAddStrategy stype) {
-    check(ll, "LLAddBase received null pointer");
-    LinkedListNode *node = NodeInit(data, NULL);
-
-    if (ll->head == NULL) {
-        ll->tail = ll->head = node;
+static bool FindResultSetResult(bool condition, struct FindResult *res, LinkedListNode *node) {
+    if (condition) {
+        res->node = node;
     } else {
-        if (stype == HEAD) {
-            node->next = ll->head;
-            ll->head = node;
-        } else {
-            ll->tail->next = node;
-            ll->tail = ll->tail->next;
-        }
+        res->prev = node;
     }
 
-    return node;
-error:
-    return NULL;
+    return condition;
 }
 
-/**
- * Add a node to the start of the Linked List
- * 
- * @param ll
- * @param data
- * @return
- */
-LinkedListNode *LLAddHead(LinkedList *ll, void *data) {
-    return LLAddBase(ll, data, HEAD);
+static bool FindByData(struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
+    return FindResultSetResult(params->compareFunc(params->data, node->data) == 0, res, node);
 }
 
-/**
- * Add a node to the end of the Linked List
- *
- * @param ll
- * @param data
- * @return
- */
-LinkedListNode *LLAddTail(LinkedList *ll, void *data) {
-    return LLAddBase(ll, data, TAIL);
+static bool FindByNode(struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
+    return FindResultSetResult(params->node == node, res, node);
 }
 
-/**
- * Shorter alias for LLAddTail
- * 
- * @param ll
- * @param data
- * @return
- */
-LinkedListNode *LLAdd(LinkedList *ll, void *data) {
-    return LLAddTail(ll, data);
+static bool FindByNextNode(struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
+    return FindResultSetResult(params->next == node->next, res, node);
 }
 
-/**
- *
- * @param data
- * @param next
- * @return
- */
-LinkedListNode *NodeInit(void *data, LinkedListNode *next) {
-    LinkedListNode *lln = malloc(sizeof (LinkedListNode));
-    check(lln, "Unable to allocate memory for linked list node");
+struct FindResult *InitFindResult() {
+    struct FindResult *res = malloc(sizeof (struct FindResult));
+    check(res, "Unable to allocate memory for FindResult");
 
-    lln->data = data;
-    lln->next = next;
+    res->node = NULL;
+    res->prev = NULL;
 
-    return lln;
-error:
-    return NULL;
-}
-
-void *LLRemoveHead(LinkedList *ll) {
-    return LLRemoveNode(ll, ll->head);
-}
-
-void *LLRemoveTail(LinkedList *ll) {
-    return LLRemoveNode(ll, ll->tail);
-}
-
-void *LLRemoveNode(LinkedList *ll, LinkedListNode *node) {
-    void *data = node->data;
-    struct FindResult *res = LLFindNode(ll, node);
-
-    check(res->node, "Node not found on List");
-
-    if (node == ll->head) {
-        if (ll->head->next == NULL) {
-            ll->head = ll->tail = NULL;
-        } else {
-            ll->head = ll->head->next;
-        }
-    } else {
-        if (node == ll->tail) {
-            res->prev->next = NULL;
-            ll->tail = res->prev;
-        } else {
-            res->prev->next = node->next;
-        }
-    }
-
-    free(node);
-    return data;
-
-error:
-    return NULL;
-}
-
-struct FindResult *LLFindNode(LinkedList *ll, LinkedListNode *node) {
-
-    struct LLFindNodeBaseParams fnbParams = {
-        .ll = ll,
-        .node = node
-    };
-    struct FindResult *res = FindNodeBase(&fnbParams);
     return res;
+
+error:
+    return NULL;
 }
 
-LinkedListNode *LLFindNodeByData(LinkedList *ll, void *data, LLFindCompareFuncPtr func) {
-
-    struct LLFindNodeBaseParams fnbParams = {
-        .ll = ll,
-        .data = data,
-        .compareFunc = func
-    };
-    struct FindResult *res = FindNodeBase(&fnbParams);
-
-    LinkedListNode *node = res->node;
-    free(res);
-
-    return node;
-}
-
-LinkedListNode *LLFindNodeByNext(LinkedList *ll, LinkedListNode *nodeNext) {
-
-    struct LLFindNodeBaseParams fnbParams = {
-        .ll = ll,
-        .next = nodeNext
-    };
-    struct FindResult *res = FindNodeBase(&fnbParams);
-
-    LinkedListNode *node = res->node;
-    free(res);
-
-    return node;
-}
-
-struct FindResult *FindNodeBase(struct LLFindNodeBaseParams *params) {
+static struct FindResult *FindNodeBase(struct LLFindNodeBaseParams *params) {
     findByFuncPtr fptr = NULL;
 
     if (params->data != NULL && params->compareFunc != NULL) {
@@ -220,9 +76,9 @@ struct FindResult *FindNodeBase(struct LLFindNodeBaseParams *params) {
         fptr = FindByNode;
     } else if (params->next != NULL) {
         fptr = FindByNextNode;
-    } else {
-        goto error;
     }
+
+    check(fptr, "Bad params for FindNodeBase, can't determine find function");
 
     LinkedListNode *node = params->ll->head;
     struct FindResult *res = InitFindResult();
@@ -248,37 +104,213 @@ error:
     return NULL;
 }
 
-bool FindByData(struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
-    return FindResultSetResult(params->compareFunc(params->data, node->data) == 0, res, node);
+static struct FindResult *LLFindNode(LinkedList *ll, LinkedListNode *node) {
+
+    struct LLFindNodeBaseParams fnbParams = {
+        .ll = ll,
+        .node = node
+    };
+    struct FindResult *res = FindNodeBase(&fnbParams);
+    return res;
 }
 
-bool FindByNode(struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
-    return FindResultSetResult(params->node == node, res, node);
+
+/**
+ *
+ * @param data
+ * @param next
+ * @return
+ */
+static LinkedListNode *NodeInit(void *data, LinkedListNode *next) {
+    LinkedListNode *lln = malloc(sizeof (LinkedListNode));
+    check(lln, "Unable to allocate memory for linked list node");
+
+    lln->data = data;
+    lln->next = next;
+
+    return lln;
+error:
+    return NULL;
 }
 
-bool FindByNextNode(struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
-    return FindResultSetResult(params->next == node->next, res, node);
-}
+/**
+ * Add an item to the linked list in the head or the tail
+ *
+ * @param ll
+ * @param data
+ * @param type
+ * @return LinkedListNode *
+ */
+static LinkedListNode *LLAddBase(LinkedList *ll, void *data, enum LLAddStrategy stype) {
+    check(ll, "LLAddBase received null pointer");
+    LinkedListNode *node = NodeInit(data, NULL);
 
-bool FindResultSetResult(bool condition, struct FindResult *res, LinkedListNode *node) {
-    if (condition) {
-        res->node = node;
+    if (ll->head == NULL) {
+        ll->tail = ll->head = node;
     } else {
-        res->prev = node;
+        if (stype == HEAD) {
+            node->next = ll->head;
+            ll->head = node;
+        } else {
+            ll->tail->next = node;
+            ll->tail = ll->tail->next;
+        }
     }
 
-    return condition;
+    return node;
+error:
+    return NULL;
 }
 
-struct FindResult *InitFindResult() {
-    struct FindResult *res = malloc(sizeof (struct FindResult));
-    check(res, "Unable to allocate memory for FindResult");
+//</editor-fold>
 
-    res->node = NULL;
-    res->prev = NULL;
+/**
+ * Initialize a linked list
+ * 
+ * @return LinkedList *
+ */
+LinkedList *LLInit() {
+    LinkedList *ll = malloc(sizeof (LinkedList));
+    check(ll, "Unable to allocate memory for linked list");
 
-    return res;
+    ll->head = NULL;
+    ll->tail = NULL;
+
+    return ll;
 
 error:
     return NULL;
 }
+
+//<editor-fold defaultstate="collapsed" desc="Add Functions">
+
+/**
+ * Add a node to the start of the Linked List
+ * 
+ * @param ll
+ * @param data
+ * @return LinkedListNode *
+ */
+LinkedListNode *LLAddHead(LinkedList *ll, void *data) {
+    return LLAddBase(ll, data, HEAD);
+}
+
+/**
+ * Add a node to the end of the Linked List
+ *
+ * @param ll
+ * @param data
+ * @return LinkedListNode *
+ */
+LinkedListNode *LLAddTail(LinkedList *ll, void *data) {
+    return LLAddBase(ll, data, TAIL);
+}
+
+/**
+ * Shorter alias for LLAddTail
+ * 
+ * @param ll
+ * @param data
+ * @return LinkedListNode *
+ */
+LinkedListNode *LLAdd(LinkedList *ll, void *data) {
+    return LLAddTail(ll, data);
+}
+
+//</editor-fold>
+
+//<editor-fold defaultstate="collapsed" desc="Remove functions">
+
+/**
+ * @param ll Pointer to linkedlist
+ * @return void * to the data in the node
+ */
+void *LLRemoveHead(LinkedList *ll) {
+    return LLRemoveNode(ll, ll->head);
+}
+
+/**
+ * @param ll Pointer to linkedlist
+ * @return void * to the data in the node
+ */
+void *LLRemoveTail(LinkedList *ll) {
+    return LLRemoveNode(ll, ll->tail);
+}
+
+/**
+ *
+ * @param ll Pointer to linkedlist
+ * @param node Pointer to node to delete
+ * @return void * to the data in the node
+ */
+void *LLRemoveNode(LinkedList *ll, LinkedListNode *node) {
+    void *data = node->data;
+    struct FindResult *res = LLFindNode(ll, node);
+
+    check(res->node, "Node not found on List");
+
+    if (node == ll->head) {
+        ll->head = ll->head->next;
+
+        if (ll->head == NULL) {
+            ll->tail = NULL;
+        }
+    } else {
+        res->prev->next = node->next;
+
+        if (node == ll->tail) {
+            ll->tail = res->prev;
+        }
+    }
+
+    free(node);
+    return data;
+
+error:
+    return NULL;
+}
+//</editor-fold>
+
+//<editor-fold defaultstate="collapsed" desc="Find functions">
+
+/** 
+ * @param ll
+ * @param data
+ * @param func
+ * @return
+ */
+LinkedListNode *LLFindNodeByData(LinkedList *ll, void *data, int (*func)(const void *, const void *)) {
+
+    struct LLFindNodeBaseParams fnbParams = {
+        .ll = ll,
+        .data = data,
+        .compareFunc = func
+    };
+    struct FindResult *res = FindNodeBase(&fnbParams);
+
+    LinkedListNode *node = res->node;
+    free(res);
+
+    return node;
+}
+
+/**
+ * @param ll
+ * @param nodeNext
+ * @return
+ */
+LinkedListNode *LLFindNodeByNext(LinkedList *ll, LinkedListNode *nodeNext) {
+
+    struct LLFindNodeBaseParams fnbParams = {
+        .ll = ll,
+        .next = nodeNext
+    };
+    struct FindResult *res = FindNodeBase(&fnbParams);
+
+    LinkedListNode *node = res->node;
+    free(res);
+
+    return node;
+}
+
+//</editor-fold>
