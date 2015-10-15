@@ -56,7 +56,7 @@ static char *test_LLAddHead() {
     return 0;
 }
 
-static int compareFuncForLLFindNodeByData(void *data_given, void *data_in_node) {
+static int compareFuncForLLFindNodeByData(const void *data_given, const void *data_in_node) {
     return strcmp(data_given, data_in_node);
 }
 
