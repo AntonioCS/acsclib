@@ -12,13 +12,12 @@
 extern "C" {
 #endif
 
-    typedef struct LinkedList LinkedList;
     typedef struct LinkedListNode LinkedListNode;
 
-    struct LinkedList {
+    typedef struct LinkedList {
         LinkedListNode *head;
         LinkedListNode *tail;
-    };
+    } LinkedList;
 
     struct LinkedListNode {
         void *data;
@@ -35,8 +34,7 @@ extern "C" {
     void *LLRemoveTail(LinkedList *);
     void *LLRemoveNode(LinkedList *, LinkedListNode *);
 
-    typedef int (*LLFindCompareFuncPtr)(void *, void *);    
-    LinkedListNode *LLFindNodeByData(LinkedList *, void *, LLFindCompareFuncPtr);
+    LinkedListNode *LLFindNodeByData(LinkedList *, void *, int (*LLFindCompareFuncPtr)(const void *, const void *));
     LinkedListNode *LLFindNodeByNext(LinkedList *, LinkedListNode *);
 
 
