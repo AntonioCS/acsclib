@@ -27,7 +27,7 @@ struct FindResult {
     LinkedListNode *node;
 };
 
-typedef bool(*findByFuncPtr)(struct LLFindNodeBaseParams *, struct FindResult *, LinkedListNode *);
+typedef bool(*findByFuncPtr)(const struct LLFindNodeBaseParams *, struct FindResult *, LinkedListNode *);
 
 //<editor-fold defaultstate="collapsed" desc="Private functions">
 
@@ -42,15 +42,15 @@ static bool FindResultSetResult(bool condition, struct FindResult *res, LinkedLi
     return condition;
 }
 
-static bool FindByData(struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
+static bool FindByData(const struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
     return FindResultSetResult(params->compareFunc(params->data, node->data) == 0, res, node);
 }
 
-static bool FindByNode(struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
+static bool FindByNode(const struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
     return FindResultSetResult(params->node == node, res, node);
 }
 
-static bool FindByNextNode(struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
+static bool FindByNextNode(const struct LLFindNodeBaseParams *params, struct FindResult *res, LinkedListNode *node) {
     return FindResultSetResult(params->next == node->next, res, node);
 }
 
@@ -67,7 +67,7 @@ error:
     return NULL;
 }
 
-static struct FindResult *FindNodeBase(struct LLFindNodeBaseParams *params) {
+static struct FindResult *FindNodeBase(const struct LLFindNodeBaseParams *params) {
     findByFuncPtr fptr = NULL;
 
     if (params->data != NULL && params->compareFunc != NULL) {
@@ -263,6 +263,7 @@ void *LLRemoveNode(LinkedList *ll, LinkedListNode *node) {
         }
     }
 
+    free(res);
     free(node);
     return data;
 
