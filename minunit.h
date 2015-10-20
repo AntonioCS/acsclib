@@ -22,7 +22,7 @@ extern "C" {
                             char *message = test(); \
                             tests_run++; \
                             if (message) { \
-                                printf("Failed at test number: %d\n", tests_run -1);\
+                                printf("Failed at test number: %d\n", tests_run);\
                                 return message; \
                             } \
                           } while (0)
