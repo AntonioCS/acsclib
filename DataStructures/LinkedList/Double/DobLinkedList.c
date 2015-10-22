@@ -15,6 +15,7 @@ DobLinkedList *DobLLInit() {
 
     dobll->head = NULL;
     dobll->tail = NULL;
+    dobll->nodeCount = 0;
 
     return dobll;
 
@@ -60,6 +61,7 @@ static DobLinkedListNode *DobLLAddBase(DobLinkedList *dobll, void *data, enum Ad
         }
     }
 
+    dobll->nodeCount++;
     return node;
 error:
     return NULL;
@@ -109,6 +111,7 @@ void *DobLLRemoveNode(DobLinkedList *dobll, DobLinkedListNode *node) {
         }
     }
 
+    dobll->nodeCount--;
     free(node);
     return data;
 }

@@ -25,6 +25,8 @@ extern "C" {
     typedef struct DobLinkedList {
         DobLinkedListNode *head;
         DobLinkedListNode *tail;
+
+        unsigned int nodeCount;
     } DobLinkedList;
 
     DobLinkedList *DobLLInit();
