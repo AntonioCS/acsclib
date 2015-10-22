@@ -9,7 +9,7 @@ int asserts_run = 0;
 static char *test_QueueInit() {
     Queue *q = QueueInit();
 
-    mu_assert("Unable to create Linked List", q);
+    mu_assert("Unable to create Queue", q);
     return 0;
 }
 
