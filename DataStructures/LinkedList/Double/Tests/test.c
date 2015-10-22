@@ -5,7 +5,6 @@
 #include "../DobLinkedList.h"
 #include "../../../../minunit.h"
 
-
 int tests_run = 0;
 int asserts_run = 0;
 
@@ -139,6 +138,47 @@ static char *test_DobLLFindNodeByData() {
     return 0;
 }
 
+static char *test_DobLLNodesCount() {
+    DobLinkedList *dobll = DobLLInit();
+
+    char data[][8] = {
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1",
+        "test 1"
+    };
+
+    int array_size = (sizeof(data)/sizeof(data[0]));
+    for (int i = 0; i < array_size; i++) {
+        DobLLAddHead(dobll, data[i]);
+    }
+
+    mu_assert("Node tail was not removed", dobll->nodeCount == array_size);
+
+    DobLLRemoveHead(dobll);
+    DobLLRemoveHead(dobll);
+    DobLLRemoveHead(dobll);
+
+    mu_assert("Node tail was not removed", dobll->nodeCount == (array_size - 3));
+
+    return 0;
+}
+
 mu_all_tests(
         test_DobLLInit,
         
@@ -148,7 +188,9 @@ mu_all_tests(
         test_DobLLRemoveTail,
         test_DobLLRemoveHead,
 
-        test_DobLLFindNodeByData
+        test_DobLLFindNodeByData,
+
+        test_DobLLNodesCount
         )
 
 mu_main()
