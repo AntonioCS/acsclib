@@ -92,12 +92,16 @@ void *DobLLRemoveTail(DobLinkedList *dobll) {
 }
 
 void *DobLLRemoveNode(DobLinkedList *dobll, DobLinkedListNode *node) {
+    if (node == NULL) {
+        return NULL;
+    }
     void *data = node->data;
 
     if (node == dobll->head) {
-        dobll->tail = dobll->head = dobll->head->next;
-
-        if (dobll->head) {
+        if (dobll->tail == dobll->head) {
+            dobll->tail = dobll->head = NULL;
+        } else {
+            dobll->head = dobll->head->next;
             dobll->head->prev = NULL;
         }
     } else {
@@ -105,8 +109,7 @@ void *DobLLRemoveNode(DobLinkedList *dobll, DobLinkedListNode *node) {
 
         if (node == dobll->tail) {
             dobll->tail = node->prev;
-        }
-        else {
+        } else {
             node->next->prev = node->prev;
         }
     }
