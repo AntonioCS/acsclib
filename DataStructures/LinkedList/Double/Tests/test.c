@@ -118,6 +118,43 @@ static char *test_DobLLRemoveHead() {
     return 0;
 }
 
+static char *test_DobLLRemoveHeadWhichIsAlsoTail() {
+    DobLinkedList *dobll = DobLLInit();
+
+    char data1[] = "test 1";
+
+    DobLLAddHead(dobll, data1);
+
+    DobLLRemoveHead(dobll);
+
+    mu_assert("Node head and tail were not set to null", dobll->head == NULL && dobll->tail == NULL);
+
+    return 0;
+}
+
+static char *test_DobLLRemoveTailWhichIsAlsoHead() {
+    DobLinkedList *dobll = DobLLInit();
+
+    char data1[] = "test 1";
+
+    DobLLAddHead(dobll, data1);
+
+    DobLLRemoveTail(dobll);
+
+    mu_assert("Node tail and head were not set to null", dobll->head == NULL && dobll->tail == NULL);
+
+    return 0;
+}
+
+static char *test_DobLLRemoveOnEmptyList() {
+    DobLinkedList *dobll = DobLLInit();
+
+    mu_assert("Node tail and head were not set to null", DobLLRemoveTail(dobll) == NULL);
+
+    return 0;
+}
+
+
 static char *test_DobLLFindNodeByData() {
     DobLinkedList *dobll = DobLLInit();
 
@@ -187,6 +224,10 @@ mu_all_tests(
         
         test_DobLLRemoveTail,
         test_DobLLRemoveHead,
+
+        test_DobLLRemoveHeadWhichIsAlsoTail,
+        test_DobLLRemoveTailWhichIsAlsoHead,
+        test_DobLLRemoveOnEmptyList,
 
         test_DobLLFindNodeByData,
 
