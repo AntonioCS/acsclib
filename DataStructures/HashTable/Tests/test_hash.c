@@ -7,7 +7,7 @@
 int tests_run = 0;
 int asserts_run = 0;
 
-#define HASH_SIZE 255
+#define HASH_SIZE 8
 
 char samples_keys[][25] = {
     "Fermina Norwood",
@@ -117,14 +117,26 @@ static char *test_hash() {
     //pretend hash table
     int hash_table[HASH_SIZE] = {0};
 
+    unsigned t, t2;
+
     unsigned int size = (sizeof samples_keys / sizeof samples_keys[0]);
     unsigned int hash_key;
 
-
-
     for (int i = 0; i < size; i++) {
-        printf("TESTE: %u\n", hash(samples_keys[i], strlen(samples_keys[i])) & 0xff);
-        printf("TESTE: %u\n", hash(samples_keys[i], strlen(samples_keys[i])) % 256);
+        t = hash(samples_keys[i], strlen(samples_keys[i])) & 0x08;
+        t2 = hash(samples_keys[i], strlen(samples_keys[i])) % 8;
+
+        if (t != t2) {
+            printf("Hashs not equal\n");
+
+            printf("TESTE: %u\n", t);
+            printf("TESTE: %u\n", t2);
+        }
+        else {
+            printf("Equal: %u\n", t);
+        }
+        //printf("TESTE: %u\n", );
+        //printf("TESTE: %u\n", );
         hash_key = hash(samples_keys[i], strlen(samples_keys[i])) % HASH_SIZE;
         hash_table[hash_key] += 1;
         //printf("%s - %u\n", keys[i], keys_numbers[i]);
