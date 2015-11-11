@@ -4,20 +4,26 @@
 
 #define DEFAULT_SIZE_LOCATION 0
 
+
+typedef struct {
+    char *key;
+    void *data;
+} HashTableNode;
+
 int powers_of_two[] = {
-    8, //2^3
-    16, //2^4
-    32, //2^5
-    64, //2^6
-    128, //2^7
-    256, //2^8
-    512, //2^9
-    1024, // 2^10
-    2048, // 2^11
-    4096, // 2^12
-    8192, // 2^13
-    16384, // 2^14
-    32768 // 2^15
+    8, //2^3 = 8
+    16, //2^4 = 16
+    32, //2^5 = 32
+    64, //2^6 = 64
+    128, //2^7 = 128
+    256, //2^8 = 256
+    512, //2^9 = 512
+    1024, // 2^10 = 1024
+    2048, // 2^11 = 2048
+    4096, // 2^12 = 4096
+    8192, // 2^13 = 8192
+    16384, // 2^14 = 16384
+    32768 // 2^15 = 32768
 };
 
 static unsigned oat_hash(void *key, int len) {
@@ -43,14 +49,13 @@ static unsigned hash(void *key, int len) {
 }
 
 static unsigned hashResult(HashTable *ht, void *key, int len) {
-    printf("hash size -> %u -- \n", ht->size);
-    return hash(key, len) & ht->size;
+    return (hash(key, len) % ht->size);
 }
 
-static DobLinkedList **createDobList(const unsigned size) {
+static DobLinkedList **createDobListArray(const unsigned size) {
     DobLinkedList **dobl = calloc(size, sizeof *dobl);
 
-    if (dobl) {       
+    if (dobl) {
         for (int i = 0; i < size; i++) {
             dobl[i] = NULL;
         }
@@ -68,7 +73,7 @@ HashTable *HashTableInitBase(const struct HashTableInitParams *params) {
     ht->items = 0;
     ht->size = powers_of_two[DEFAULT_SIZE_LOCATION];
 
-    ht->htable = createDobList(ht->size);
+    ht->htable = createDobListArray(ht->size);
 
     check(ht->htable, "Unable to allocate space for internal struct");
 
@@ -91,6 +96,58 @@ error:
     return NULL;
 }
 
+static HashTableNode *createHtNode(char *key, void *data) {
+    HashTableNode *htNode = calloc(1, sizeof (HashTableNode));
+    check (htNode, "Unable to create HashTable Node\n");
+
+    htNode->key = key;
+    htNode->data = data;
+
+    return htNode;
+
+    error:
+        return NULL;
+}
+
+static bool compHashTableNode(const void *cmp, const void *cmp2) {
+    return (strcmp(cmp, cmp2) == 0);
+}
+
+static void htAdd(HashTable *ht, unsigned k, char *key, void *data) {
+    HashTableNode *htNode = createHtNode(key, data);
+    check(htNode, "No hash table Node");
+
+    DobLinkedList *dob = ht->htable[k];
+
+    if (dob == NULL) {
+        dob = DobLLInit();
+        check(dob != NULL, "Unable to create Linked List");
+
+        DobLLAdd(dob, htNode);
+    }
+    else {
+        DobLinkedListNode *dobExistingNode = DobLLFindNodeByData(dob, htNode, compHashTableNode);
+
+        if (dobExistingNode != NULL) {
+            HashTableNode *htNodeExisting = (htNodeExisting *)dobExistingNode->data;
+            htNodeExisting->data = data;
+        }
+        else {
+            DobLLAdd(dob, htNode);
+        }
+    }
+
+error:
+    return NULL;
+
+}
+
 void HashTableAdd(HashTable *ht, char *key, void *data) {
-    printf("key -> %u\n", hashResult(ht, key, strlen(key)));    
+    unsigned key_numeric = hashResult(ht, key, strlen(key));
+    check(key_numeric < ht->size, "Returned key is bigger than size: %s --- %u\n", key, key_numeric);
+    htAdd(ht, key_numeric, key, data);
+
+error:
+    //do nothing
+    ;
 }
