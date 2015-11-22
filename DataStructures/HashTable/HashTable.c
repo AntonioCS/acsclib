@@ -151,3 +151,7 @@ error:
     //do nothing
     ;
 }
+
+void *HashTableGet(HashTable *ht, char *key) {
+
+}
