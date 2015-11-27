@@ -113,11 +113,11 @@ static bool compHashTableNode(const void *cmp, const void *cmp2) {
     return (strcmp(cmp, cmp2) == 0);
 }
 
-static void htAdd(HashTable *ht, unsigned k, char *key, void *data) {
+static void htAdd(HashTable *ht, unsigned key_numeric, char *key, void *data) {
     HashTableNode *htNode = createHtNode(key, data);
     check(htNode, "No hash table Node");
 
-    DobLinkedList *dob = ht->htable[k];
+    DobLinkedList *dob = ht->htable[key_numeric];
 
     if (dob == NULL) {
         dob = DobLLInit();
