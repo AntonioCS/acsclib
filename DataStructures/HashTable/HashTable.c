@@ -7,7 +7,7 @@
 
 typedef struct {
     char *key;
-    void *data;
+    void *value;
 } HashTableNode;
 
 int powers_of_two[] = {
@@ -101,7 +101,7 @@ static HashTableNode *createHtNode(char *key, void *data) {
     check (htNode, "Unable to create HashTable Node\n");
 
     htNode->key = key;
-    htNode->data = data;
+    htNode->value = data;
 
     return htNode;
 
@@ -109,8 +109,8 @@ static HashTableNode *createHtNode(char *key, void *data) {
         return NULL;
 }
 
-static bool compHashTableNode(const void *cmp, const void *cmp2) {
-    return (strcmp(cmp, cmp2) == 0);
+static bool compHashTableNode(const HashTableNode *cmp, const HashTableNode *cmp2) {
+    return (strcmp(cmp->key, cmp2->key) == 0);
 }
 
 static void htAdd(HashTable *ht, unsigned key_numeric, char *key, void *data) {
@@ -130,7 +130,7 @@ static void htAdd(HashTable *ht, unsigned key_numeric, char *key, void *data) {
 
         if (dobExistingNode != NULL) {
             HashTableNode *htNodeExisting = (htNodeExisting *)dobExistingNode->data;
-            htNodeExisting->data = data;
+            htNodeExisting->value = data;
         }
         else {
             DobLLAdd(dob, htNode);
@@ -153,5 +153,26 @@ error:
 }
 
 void *HashTableGet(HashTable *ht, char *key) {
+    unsigned key_numeric = hashResult(ht, key, strlen(key));
 
+    DobLinkedList *dob = ht->htable[key_numeric];
+
+    if (dob) {
+        switch (dob->nodeCount) {
+            case 0:
+                return NULL;
+            case 1:
+                return dob->head->data->value;
+            default:
+            {
+                DobLinkedListNode *dobExistingNode = DobLLFindNodeByData(dob, htNode, compHashTableNode);
+
+                if (dobExistingNode) {
+                    return dobExistingNode->data->value;
+                }
+            }
+        }
+    }
+
+    return NULL;
 }
