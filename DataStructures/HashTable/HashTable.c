@@ -3,13 +3,12 @@
 #include "../../dbg.h"
 
 #define DEFAULT_SIZE_LOCATION 0
-
-
+/*
 typedef struct {
     char *key;
     void *value;
 } HashTableNode;
-
+*/
 int powers_of_two[] = {
     8, //2^3 = 8
     16, //2^4 = 16
@@ -98,22 +97,32 @@ error:
 
 static HashTableNode *createHtNode(char *key, void *data) {
     HashTableNode *htNode = calloc(1, sizeof (HashTableNode));
-    check (htNode, "Unable to create HashTable Node\n");
+    check(htNode, "Unable to create HashTable Node\n");
 
     htNode->key = key;
     htNode->value = data;
 
     return htNode;
 
-    error:
-        return NULL;
+error:
+    return NULL;
 }
 
-static bool compHashTableNode(const HashTableNode *cmp, const HashTableNode *cmp2) {
-    return (strcmp(cmp->key, cmp2->key) == 0);
+//static bool compHashTableNode(const HashTableNode *cmp, const HashTableNode *cmp2) {
+
+static bool compHashTableNodeKey(const void *cmp, const void *cmp2) {
+    HashTableNode *a = (HashTableNode *) cmp;
+    HashTableNode *b = (HashTableNode *) cmp2;
+
+    return (strcmp(a->key, b->key) == 0);
 }
 
-static void htAdd(HashTable *ht, unsigned key_numeric, char *key, void *data) {
+bool HashTableAdd(HashTable *ht, char *key, void *data) {
+    unsigned key_numeric = hashResult(ht, key, strlen(key));
+    check(key_numeric < ht->size, "Returned key is bigger than size: %s --- %u\n", key, key_numeric);
+
+    printf("Hashtable DEBUG: Numeric key %d from %s\n", key_numeric, key);
+
     HashTableNode *htNode = createHtNode(key, data);
     check(htNode, "No hash table Node");
 
@@ -124,32 +133,31 @@ static void htAdd(HashTable *ht, unsigned key_numeric, char *key, void *data) {
         check(dob != NULL, "Unable to create Linked List");
 
         DobLLAdd(dob, htNode);
-    }
-    else {
-        DobLinkedListNode *dobExistingNode = DobLLFindNodeByData(dob, htNode, compHashTableNode);
+
+        ht->htable[key_numeric] = dob;
+        ht->items++;
+    } else {
+        DobLinkedListNode *dobExistingNode = DobLLFindNodeByData(dob, htNode, compHashTableNodeKey);
 
         if (dobExistingNode != NULL) {
-            HashTableNode *htNodeExisting = (htNodeExisting *)dobExistingNode->data;
+            HashTableNode *htNodeExisting = (HashTableNode *) dobExistingNode->data;
             htNodeExisting->value = data;
-        }
-        else {
+        } else {
             DobLLAdd(dob, htNode);
         }
     }
 
-error:
-    return NULL;
+    return true;
 
+error:
+    return false;
 }
 
-void HashTableAdd(HashTable *ht, char *key, void *data) {
-    unsigned key_numeric = hashResult(ht, key, strlen(key));
-    check(key_numeric < ht->size, "Returned key is bigger than size: %s --- %u\n", key, key_numeric);
-    htAdd(ht, key_numeric, key, data);
+static bool compHashTableNodeKeyString(const void *cmp, const void *cmp2) {
+    char *key = (char *) cmp;
+    HashTableNode *b = (HashTableNode *) cmp2;
 
-error:
-    //do nothing
-    ;
+    return (strcmp(key, b->key) == 0);
 }
 
 void *HashTableGet(HashTable *ht, char *key) {
@@ -162,16 +170,18 @@ void *HashTableGet(HashTable *ht, char *key) {
             case 0:
                 return NULL;
             case 1:
-                return dob->head->data->value;
+                return ((HashTableNode *) dob->head->data)->value;
             default:
             {
-                DobLinkedListNode *dobExistingNode = DobLLFindNodeByData(dob, htNode, compHashTableNode);
+                DobLinkedListNode *dobExistingNode = DobLLFindNodeByData(dob, key, compHashTableNodeKeyString);
 
                 if (dobExistingNode) {
-                    return dobExistingNode->data->value;
+                    return ((HashTableNode *) dobExistingNode->data)->value;
                 }
             }
         }
+    } else {
+        printf("No key found\n");
     }
 
     return NULL;
