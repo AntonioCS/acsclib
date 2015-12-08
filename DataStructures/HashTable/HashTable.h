@@ -11,13 +11,18 @@
 #include "../LinkedList/Double/DobLinkedList.h"
 
 #ifndef HASHTABLE_H
-#define	HASHTABLE_H
+#define HASHTABLE_H
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
 #define HASHTABLE_DEFAULT_SIZE 
+
+    typedef struct {
+        char *key;
+        void *value;
+    } HashTableNode;
 
     typedef struct HashTable {
         unsigned items;
@@ -30,14 +35,15 @@ extern "C" {
         bool (*del)(void *);
     } HashTable;
 
-    struct HashTableInitParams {        
+    struct HashTableInitParams {
         bool (*comp)(const void *, const void *);
         bool (*del)(void *);
     };
 
     HashTable *HashTableInitBase(const struct HashTableInitParams *);
-    void HashTableAdd(HashTable *, char *, void *);
-    void HashTableRemove(HashTable *, void *);
+    bool HashTableAdd(HashTable *, char *, void *);
+    void *HashTableGet(HashTable *, char *);
+    void *HashTableRemove(HashTable *, void *);
 
 #define HashTableInit(...) HashTableInitBase(&( \
     (struct HashTableInitParams){\
@@ -47,9 +53,9 @@ extern "C" {
     }\
 ))
 
-#ifdef	__cplusplus
+#ifdef __cplusplus
 }
 #endif
 
-#endif	/* HASHTABLE_H */
+#endif /* HASHTABLE_H */
 
