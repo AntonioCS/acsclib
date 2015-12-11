@@ -7,29 +7,6 @@
 int tests_run = 0;
 int asserts_run = 0;
 
-static void debug_hashtable(HashTable *ht) {
-    printf("Hashtable size: %d\n", ht->size);
-    printf("Hashtable items: %d\n", ht->items);
-
-    for (int i = 0; i < ht->size; i++) {
-        DobLinkedList *dob = ht->htable[i];
-
-        if (dob) {
-            printf("Listing item %d:\n", i);
-            DobLinkedListNode *node = dob->head;
-
-            while (node) {
-                HashTableNode *hnode = (HashTableNode *)node->data;
-
-                printf("HashNode Key: %s\n", hnode->key);
-                printf("HashNode value: %s\n", (char *)hnode->value);
-
-                node = node->next;
-            }
-        }
-    }
-}
-
 static char *test_HashTableInit() {
     HashTable *ht = HashTableInit();
 
@@ -51,11 +28,11 @@ static char *test_HashTableAddOverwrite() {
 
     mu_assert("Returned false" , (HashTableAdd(ht, "tes1te", "teste2")));
 
-    debug_hashtable(ht);
+    HashTable_Debug(ht);
 
     mu_assert("Returned false" , (HashTableAdd(ht, "tes1te", "teste333332")));
 
-    debug_hashtable(ht);
+    HashTable_Debug(ht);
 
     return 0;
 }
