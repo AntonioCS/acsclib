@@ -17,13 +17,8 @@
 extern "C" {
 #endif
 
-#define HASHTABLE_DEFAULT_SIZE 
-
-    typedef struct {
-        char *key;
-        void *value;
-    } HashTableNode;
-
+#define DEBUG_HASHTABLE
+#define HASHTABLE_DEFAULT_SIZE 8
     typedef struct HashTable {
         unsigned items;
         unsigned size;
@@ -52,6 +47,10 @@ extern "C" {
             __VA_ARGS__\
     }\
 ))
+
+#if defined(DEBUG_HASHTABLE)
+    void HashTable_Debug(HashTable *);
+#endif
 
 #ifdef __cplusplus
 }
