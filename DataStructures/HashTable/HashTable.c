@@ -3,12 +3,12 @@
 #include "../../dbg.h"
 
 #define DEFAULT_SIZE_LOCATION 0
-/*
+
 typedef struct {
     char *key;
     void *value;
 } HashTableNode;
-*/
+
 int powers_of_two[] = {
     8, //2^3 = 8
     16, //2^4 = 16
@@ -186,3 +186,30 @@ void *HashTableGet(HashTable *ht, char *key) {
 
     return NULL;
 }
+
+#if defined(DEBUG_HASHTABLE)
+
+void HashTable_Debug(HashTable *ht) {
+    printf("Hashtable size: %d\n", ht->size);
+    printf("Hashtable items: %d\n", ht->items);
+
+    for (int i = 0; i < ht->size; i++) {
+        DobLinkedList *dob = ht->htable[i];
+
+        if (dob) {
+            printf("Listing item %d:\n", i);
+            DobLinkedListNode *node = dob->head;
+
+            while (node) {
+                HashTableNode *hnode = (HashTableNode *)node->data;
+
+                printf("HashNode Key: %s\n", hnode->key);
+                printf("HashNode value: %s\n", (char *)hnode->value);
+
+                node = node->next;
+            }
+        }
+    }
+}
+
+#endif
