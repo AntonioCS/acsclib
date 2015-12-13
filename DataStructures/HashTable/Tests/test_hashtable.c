@@ -15,10 +15,12 @@ static char *test_HashTableInit() {
     return 0;
 }
 
-static char *test_HashTableAdd() {
+static char *test_HashTableAdd_HashTableGet() {
     HashTable *ht = HashTableInit();
 
-    mu_assert("Returned false" , (HashTableAdd(ht, "tes1te", "teste2")));
+    mu_assert("Failed to set the value", (HashTableAdd(ht, "test", "test2")));
+
+    mu_assert("Failed to retrieve the value", strcmp(HashTableGet(ht, "test"), "test2") == 0);
 
     return 0;
 }
@@ -26,36 +28,69 @@ static char *test_HashTableAdd() {
 static char *test_HashTableAddOverwrite() {
     HashTable *ht = HashTableInit();
 
-    mu_assert("Returned false" , (HashTableAdd(ht, "tes1te", "teste2")));
+    mu_assert("Failed to set the value", (HashTableAdd(ht, "test", "test2")));
+    mu_assert("Failed to retrieve the value", strcmp(HashTableGet(ht, "test"), "test2") == 0);
 
-    HashTable_Debug(ht);
+    //HashTable_Debug(ht);
 
-    mu_assert("Returned false" , (HashTableAdd(ht, "tes1te", "teste333332")));
+    mu_assert("Failed to re set the value", (HashTableAdd(ht, "test", "test2234")));
+    mu_assert("Failed to retrieve altered the value", strcmp(HashTableGet(ht, "test"), "test2234") == 0);
 
     HashTable_Debug(ht);
 
     return 0;
 }
 
-/*
-static char *test_HashTableAdd_and_Get() {
-    HashTable *ht = HashTableInit();
+static char *test_HashTableAddForceRealloc() {
 
-    mu_assert("Returned false" , (HashTableAdd(ht, "tes1te", "teste2")));
+    char testewords[] = {
+        "winter", "wren",
+        "ambiguous", "mere",
+        "honorable", "hysterical",
+        "dust", "divide",
+        "rifle", "notice",
+        "risk", "handsomely",
+        "well-to-do", "hall",
+        "sedate", "wrong",
+        "bow", "exotic",
+        "confused", "furry",
+        "decision", "alive",
+        "knife", "silver",
+        "kitty", "recondite",
+        "face", "identify",
+        "bushes", "rainy",
+        "normal", "immense",
+        "sky", "borrow",
+        "soft", "twig",
+        "sweet", "scarecrow",
+        "unkempt", "toothsome",
+        "sneaky", "desk",
+        "relax", "can",
+        "tall", "gold",
+        "sail", "raspy",
+        "squeamish", "maid",
+        "grass", "grubby",
+        "ignorant", "expect",
+        "touch", "ambitious",
+        "fancy", "men",
+        "slave", "glue",
+        "faded", "pan",
+        "babies", "haunt",
+        "border", "settle"
+    };
 
-    char *valor = (char *)HashTableGet(ht, "tes1te");
-    printf("Valor: %s\n", valor);
+    
 
-    debug_hashtable(ht);
 
     return 0;
-}*/
+}
+
+
 
 mu_all_tests(
         test_HashTableInit,
-        test_HashTableAdd,
+        test_HashTableAdd_HashTableGet,
         test_HashTableAddOverwrite
-   //     test_HashTableAdd_and_Get
         )
 
 mu_main()
