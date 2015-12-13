@@ -108,8 +108,6 @@ error:
     return NULL;
 }
 
-//static bool compHashTableNode(const HashTableNode *cmp, const HashTableNode *cmp2) {
-
 static bool compHashTableNodeKey(const void *cmp, const void *cmp2) {
     HashTableNode *a = (HashTableNode *) cmp;
     HashTableNode *b = (HashTableNode *) cmp2;
@@ -121,7 +119,9 @@ bool HashTableAdd(HashTable *ht, char *key, void *data) {
     unsigned key_numeric = hashResult(ht, key, strlen(key));
     check(key_numeric < ht->size, "Returned key is bigger than size: %s --- %u\n", key, key_numeric);
 
+#if defined(DEBUG_HASHTABLE)
     printf("Hashtable DEBUG: Numeric key %d from %s\n", key_numeric, key);
+#endif
 
     HashTableNode *htNode = createHtNode(key, data);
     check(htNode, "No hash table Node");
@@ -180,9 +180,12 @@ void *HashTableGet(HashTable *ht, char *key) {
                 }
             }
         }
-    } else {
-        printf("No key found\n");
     }
+#if defined(DEBUG_HASHTABLE)
+    else {
+        printf("Hashtable DEBUG: No value found for key - %s\n", key);
+    }
+#endif
 
     return NULL;
 }
@@ -190,6 +193,8 @@ void *HashTableGet(HashTable *ht, char *key) {
 #if defined(DEBUG_HASHTABLE)
 
 void HashTable_Debug(HashTable *ht) {
+    printf("\n-------- HASHTABLE DUMP --------\n");
+
     printf("Hashtable size: %d\n", ht->size);
     printf("Hashtable items: %d\n", ht->items);
 
@@ -201,15 +206,17 @@ void HashTable_Debug(HashTable *ht) {
             DobLinkedListNode *node = dob->head;
 
             while (node) {
-                HashTableNode *hnode = (HashTableNode *)node->data;
+                HashTableNode *hnode = (HashTableNode *) node->data;
 
-                printf("HashNode Key: %s\n", hnode->key);
-                printf("HashNode value: %s\n", (char *)hnode->value);
+                printf("\tHashNode Key: %s\n", hnode->key);
+                printf("\tHashNode value: %s\n", (char *) hnode->value);
 
                 node = node->next;
             }
         }
     }
+
+    printf("-------- HASHTABLE DUMP END --------\n\n");
 }
 
 #endif
