@@ -20,3 +20,6 @@ HashTest: DataStructures/HashTable/Tests/test_hash.c
 
 HashTableTest: DataStructures/HashTable/Tests/test_hashtable.c DataStructures/HashTable/HashTable.c $(DOUBLELLFILES)
 	$(CC) $(CFLAGS) -o $@ $^
+
+splitStringTest: Util/Strings/Split/Tests/test.c Util/Strings/Split/split.c
+	$(CC) $(CFLAGS) -o $@ $^
