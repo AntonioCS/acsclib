@@ -25,7 +25,8 @@ int powers_of_two[] = {
     32768 // 2^15 = 32768
 };
 
-static unsigned oat_hash(void *key, int len) {
+static unsigned
+oat_hash(void *key, int len) {
     unsigned char *p = key;
     unsigned h = 0;
     int i;
@@ -43,15 +44,18 @@ static unsigned oat_hash(void *key, int len) {
     return h;
 }
 
-static unsigned hash(void *key, int len) {
+static unsigned
+hash(void *key, int len) {
     return oat_hash(key, len);
 }
 
-static unsigned hashResult(HashTable *ht, void *key, int len) {
+static unsigned
+hashResult(HashTable *ht, void *key, int len) {
     return (hash(key, len) % ht->size);
 }
 
-static DobLinkedList **createDobListArray(const unsigned size) {
+static DobLinkedList **
+createDobListArray(const unsigned size) {
     DobLinkedList **dobl = calloc(size, sizeof *dobl);
 
     if (dobl) {
@@ -65,7 +69,8 @@ static DobLinkedList **createDobListArray(const unsigned size) {
     return NULL;
 }
 
-HashTable *HashTableInitBase(const struct HashTableInitParams *params) {
+HashTable *
+HashTableInitBase(const struct HashTableInitParams *params) {
     HashTable *ht = calloc(1, sizeof (HashTable));
     check(ht, "Unable to allocate hashtable structure");
 
@@ -95,7 +100,11 @@ error:
     return NULL;
 }
 
-static HashTableNode *createHtNode(char *key, void *data) {
+static HashTableNode *
+createHtNode(
+	char *key,
+	void *data
+) {
     HashTableNode *htNode = calloc(1, sizeof (HashTableNode));
     check(htNode, "Unable to create HashTable Node\n");
 
@@ -108,14 +117,16 @@ error:
     return NULL;
 }
 
-static bool compHashTableNodeKey(const void *cmp, const void *cmp2) {
+static bool
+compHashTableNodeKey(const void *cmp, const void *cmp2) {
     HashTableNode *a = (HashTableNode *) cmp;
     HashTableNode *b = (HashTableNode *) cmp2;
 
     return (strcmp(a->key, b->key) == 0);
 }
 
-bool HashTableAdd(HashTable *ht, char *key, void *data) {
+bool
+HashTableAdd(HashTable *ht, char *key, void *data) {
     unsigned key_numeric = hashResult(ht, key, strlen(key));
     check(key_numeric < ht->size, "Returned key is bigger than size: %s --- %u\n", key, key_numeric);
 
@@ -153,14 +164,16 @@ error:
     return false;
 }
 
-static bool compHashTableNodeKeyString(const void *cmp, const void *cmp2) {
+static bool
+compHashTableNodeKeyString(const void *cmp, const void *cmp2) {
     char *key = (char *) cmp;
     HashTableNode *b = (HashTableNode *) cmp2;
 
     return (strcmp(key, b->key) == 0);
 }
 
-void *HashTableGet(HashTable *ht, char *key) {
+void *
+HashTableGet(HashTable *ht, char *key) {
     unsigned key_numeric = hashResult(ht, key, strlen(key));
 
     DobLinkedList *dob = ht->htable[key_numeric];
@@ -192,7 +205,8 @@ void *HashTableGet(HashTable *ht, char *key) {
 
 #if defined(DEBUG_HASHTABLE)
 
-void HashTable_Debug(HashTable *ht) {
+void
+HashTable_Debug(HashTable *ht) {
     printf("\n-------- HASHTABLE DUMP --------\n");
 
     printf("Hashtable size: %d\n", ht->size);
