@@ -36,14 +36,14 @@ static char *test_HashTableAddOverwrite() {
     mu_assert("Failed to re set the value", (HashTableAdd(ht, "test", "test2234")));
     mu_assert("Failed to retrieve altered the value", strcmp(HashTableGet(ht, "test"), "test2234") == 0);
 
-    HashTable_Debug(ht);
+    //HashTable_Debug(ht);
 
     return 0;
 }
 
 static char *test_HashTableAddForceRealloc() {
 
-    char testewords[] = {
+    char testewords[][20] = {
         "winter", "wren",
         "ambiguous", "mere",
         "honorable", "hysterical",
@@ -79,7 +79,7 @@ static char *test_HashTableAddForceRealloc() {
         "border", "settle"
     };
 
-    
+
 
 
     return 0;
