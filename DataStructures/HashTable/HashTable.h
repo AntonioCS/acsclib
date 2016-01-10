@@ -7,7 +7,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
+#include <stdbool.h> //true, false
+#include <stdint.h> //uint64_t
 #include "../LinkedList/Double/DobLinkedList.h"
 
 #ifndef HASHTABLE_H
@@ -20,8 +21,8 @@ extern "C" {
 #define DEBUG_HASHTABLE
 #define HASHTABLE_DEFAULT_SIZE 8
     typedef struct HashTable {
-        unsigned items;
-        unsigned size;
+        uint64_t items;
+        uint64_t size;
 
         //array of hash tables
         DobLinkedList **htable;
