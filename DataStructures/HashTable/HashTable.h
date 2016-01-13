@@ -39,7 +39,7 @@ extern "C" {
     HashTable *HashTableInitBase(const struct HashTableInitParams *);
     bool HashTableAdd(HashTable *, char *, void *);
     void *HashTableGet(HashTable *, char *);
-    void *HashTableRemove(HashTable *, void *);
+    void *HashTable_Remove(HashTable *, char *);
 
 #define HashTableInit(...) HashTableInitBase(&( \
     (struct HashTableInitParams){\
